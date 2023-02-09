@@ -1,32 +1,13 @@
-//require('dotenv').config()
-
-// usage : node server.js --port=8000 --address=0.0.0.0
-
-const yargs = require('yargs/yargs');
-
-const { argv } = yargs(process.argv.slice(2))
-    .option('port', {
-        demandOption: false,
-        default: 8000,
-        describe: "Le numéro de port pour l'écoute du serveur",
-        type: "number"
-    })
-    .option('address', {
-        demandOption: false,
-        default: '127.0.0.1',
-        desribe: "L'adresse IP pour l'écoute du serveur",
-        type: "string"
-    })
-
-const { port, address } = argv;
-
 const cluster = require('cluster');
-const os = require('os');
+
+const { 
+    argv: { port, address, workers } 
+} = require('./cli');
 
 if(cluster.isMaster) {
-    const nr_cpus = os.cpus().length;
+    console.log(`[master] Démarrage de ${workers} esclaves...`)
 
-    for(let i = 0; i < nr_cpus; i++) {
+    for(let i = 0; i < workers; i++) {
         cluster.fork();
     }
 
